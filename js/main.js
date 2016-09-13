@@ -13,6 +13,22 @@ var currentList = studentsList;
 // INITIALIZE NUMBER OF PAGES (STUDENTS DIVIDED BY TEN)
 var numberOfPages = Math.ceil((currentList.length) / 10);
 
+// ADD SEARCH BAR TO PAGE
+var addSearch = function () {
+    var pageHeader = document.querySelector(".page-header");
+    var searchArea = document.createElement("div");
+    var searchBox = document.createElement("input");
+    var searchButton = document.createElement("button");
+    searchArea.setAttribute("class", "student-search");
+    searchBox.setAttribute("id", "search");
+    searchBox.setAttribute("placeholder", "Search for students...");
+    searchButton.setAttribute("id", "search-button");
+    searchButton.innerText = "Search";
+    searchArea.appendChild(searchBox);
+    searchArea.appendChild(searchButton);
+    pageHeader.appendChild(searchArea);
+}
+
 // HIDE ALL STUDENT ITEMS
 var hideStudentsList = function () {
     for (i = 0; i < studentsList.length; i++) { // for each student item
@@ -130,6 +146,7 @@ var bindSearch = function () {
     noResultsMessage.classList.add("hidden");
 
 // initialize page
+addSearch();
 hideStudentsList();
 makePageList();
 showPage(1, currentList);
