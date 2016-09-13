@@ -1,3 +1,4 @@
+
 body{
   background-color: #e1f1f6;
   font-family: Helvetica, sans-serif;
@@ -15,13 +16,24 @@ body{
 .page-header{
   margin-bottom: 20px;
 }
-  .page-header h2{
+  .page-header h2 {
     float: left;
     font-size: 22px;
     text-transform: uppercase;
     font-weight: bold;
     color: #555;
   }
+
+.page-header h4 {
+    float: left;
+    font-size: 16px;
+    text-transform: uppercase;
+    text-decoration: underline;
+    font-weight: normal;
+    color: #666;
+    padding-top: 5px;
+    padding-left: 15px;
+}
 
   .page-header .student-search{
     float: right;
@@ -118,6 +130,31 @@ body{
       color: #fff;
     }
 
+
+/* additional classes */
+
+@keyframes bloom {
+    from {background-color: #999;}
+    to {background-color: #fff;}
+}
+
 .hidden {
     display: none;
 }
+
+.show {
+    animation-name: bloom;
+    animation-duration: 1.5s;
+    animation-iteration-count: 1;
+    animation-timing-function: ease-out;
+}
+
+h1 {
+    font-size: 3em;
+    text-align: center;
+    margin-top: 100px;
+    animation-name: changing;
+    animation-duration: 2s;
+    animation-iteration-count: 1;
+}
+

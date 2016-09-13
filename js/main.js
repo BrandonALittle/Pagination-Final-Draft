@@ -1,38 +1,57 @@
+// CREATE RANGE INDICATOR;
+var rangeIndex = document.createElement("h4");
+
 // GET ELEMENT CONTAINING STUDENT ITEMS
 var studentListContainer = document.getElementsByTagName("ul")[0];
 
 // GET LIST OF STUDENT ITEMS
 var studentsList = studentListContainer.children;
 
-// GET NUMBER OF PAGES (STUDENTS DIVIDED BY TEN)
-var numberOfPages = Math.ceil((studentsList.length) / 10);
+// INITIALIZE CURRENT STUDENT LIST, WHICH CAN CHANGE
+var currentList = studentsList;
+
+// INITIALIZE NUMBER OF PAGES (STUDENTS DIVIDED BY TEN)
+var numberOfPages = Math.ceil((currentList.length) / 10);
 
 // HIDE ALL STUDENT ITEMS
 var hideStudentsList = function () {
-    for (i = 0; i < studentsList.length; i++) {
-        var classList = studentsList[i].classList;
-        classList.add("hidden");
+    for (i = 0; i < studentsList.length; i++) { // for each student item
+        var classList = studentsList[i].classList; // get class list
+        classList.add("hidden"); // and add hidden class to list
+        classList.remove("show"); // remove css animation class
     }
 }
 
 // SHOW SELECTED STUDENT ITEMS (DEFINED BY PAGE OF TEN)
-var showPage = function (page) {
-    var rangeMax = page * 10; 
-    var rangeMin = rangeMax - 10;
-    hideStudentsList();
+var showPage = function (page, currentList) {
+    var rangeMax = page * 10; // calculate upper range of items to show
+    if (currentList.length < rangeMax) { // if the length of the list is less than the upper limit, i.e. there are less than ten to currently show,
+        rangeMax = currentList.length; // set the upper limit to the length of the list
+    }
+    var rangeMin = rangeMax - 10; // calculate the lower end of the limit. THIS IS PROBLEMATIC
+    rangeIndex.innerText = " Showing students " + rangeMin + " - " + (rangeMax - 1) + " out of " + currentList.length; // add statement to indicate which student items are currently being shown from the matching set
+    var pageHeader = document.querySelector(".page-header");
+    pageHeader.appendChild(rangeIndex); // add message to page
+    hideStudentsList(); // hide all student items so that the page can refresh
     for (i = rangeMin; i < rangeMax; i++) {
-        if (studentsList[i]) { // CHECK THAT THERE IS STUDENT ITEM AT THIS INDEX
-            var classList = studentsList[i].classList;
+        if (currentList[i]) { // CHECK THAT THERE IS STUDENT ITEM AT THIS INDEX
+            var classList = currentList[i].classList;
             classList.remove("hidden"); // REMOVE CLASS THAT HIDES THE STUDENT LIST ITEM
+            classList.toggle("show");
         }
     }
 }
 
 // CREATE UNORDERED LIST FOR PAGINATION LINKS
 var makePageList = function() {
+    if (document.querySelector(".pagination")) { // if there is already a pagination list,
+        var page = document.querySelector(".page"); 
+        var pagination = document.querySelector(".pagination"); 
+        page.removeChild(pagination); // get it and remove it
+    }
     var pageList = document.createElement("ul"); // CREATE UNORDERED LIST
     // FOR EACH PAGE, CREATE  LIST ELEMENT, ADD LINK, ATTRIBUTE, SET PAGE NUMBER AS INNER TEXT, AND ADD TO UNORDERED LIST
-    for (i = 1; i <= numberOfPages; i++) { 
+    for (i = 1; i <= numberOfPages; i++) { // create  new pagination list
         var page = document.createElement("li");
         var pageLink = document.createElement("a");
         pageLink.setAttribute("href", "#");
@@ -43,17 +62,13 @@ var makePageList = function() {
     var newPagination = document.createElement("div"); // CREATE PAGINATION CONTAINER
     newPagination.appendChild(pageList); 
     newPagination.classList.add("pagination");
-    if (document.querySelector(".pagination")) {
-        var oldPagination = document.querySelector(".pagination");
-        oldPagination.parentElement.removeChild(oldPagination);
-    }
     var page = document.querySelector(".page");
-    page.appendChild(newPagination);
+    page.appendChild(newPagination); // add pagination container and list to page
 }
 
 // BIND CLICK EVENTS TO PAGE DISPLAY
 var bindPageHandlerEvents = function () {
-    var paginationDiv = document.querySelector(".pagination");
+    var paginationDiv = document.querySelector(".pagination"); // get pagination div
     var pageList = paginationDiv.firstChild;
     var pageListItems = pageList.children;
     for (i = 0; i < pageListItems.length; i++) {
@@ -61,13 +76,62 @@ var bindPageHandlerEvents = function () {
         // BIND CLICK EVENT
         currentListItem.addEventListener('click', function () {
             var targetPage = event.target.innerText; // GET PAGE NUMBER FROM INNER TEXT OF LINK
-            showPage(targetPage); // SEND PAGE NUMBER TO DISPLAY FUNCTION TO REFRESH STUDENTS ON PAGE
+            showPage(targetPage, currentList); // SEND PAGE NUMBER TO DISPLAY FUNCTION TO REFRESH STUDENTS ON PAGE
         });
     }
 }
 
+// GET USER SEARCH INPUT AND CREATE MATCHNG LIST
+var search = function () {
+    var searchTarget = document.querySelector("#search").value; // get user input
+    var searchTargetExp = new RegExp(searchTarget,'i'); // create new regular expression from user input
+    var newStudentList = []; // create new list of results
+    hideStudentsList(); // hide all student items to refresh page
+    for (i=0; i<studentsList.length; i++) {
+        var studentName = studentsList[i].querySelector("h3").innerText; // get student info
+        var studentEmail = studentsList[i].querySelector("span").innerText;
+        var testForName = searchTargetExp.test(studentName); // compare search query to student info
+        var testForEmail = searchTargetExp.test(studentEmail);
+        if (testForName || testForEmail) { // if student info matches search query, add student to list
+            newStudentList.push(studentsList[i]);
+        }
+    }
+    currentList = newStudentList; // update list to matching student list
+    numberOfPages = Math.ceil((currentList.length) / 10);
+    makePageList(); // create pagination for list
+    showPage(1, currentList); // show first page
+    bindPageHandlerEvents(); // bind click events
+    if (searchTarget.length > 0) {
+        rangeIndex.innerText = "showing students that match '" + searchTarget + "'";
+    }
+    if (currentList.length === 0) { // if there are no matching students
+        noResultsMessage.classList.remove("hidden"); // show message telling user there are no matching results
+    } else {
+        noResultsMessage.classList.add("hidden");
+    }
+}
 
+// bind event to search box
+var bindSearch = function () {
+    var searchBox = document.querySelector("#search"); // get search box
+    searchBox.addEventListener('input', function () { // add event to user input, making search dynamically responsive
+        search();
+    });
+    var searchButton = document.querySelector("#search-button"); 
+    searchButton.addEventListener('click', function () { // add event to search button
+        search();
+    })
+}
+
+    var content = document.querySelector(".page"); 
+    var noResultsMessage = document.createElement("h1"); // create message telling user there are no results
+    noResultsMessage.innerText = "I'm sorry. None of our student records match your search.";
+    content.appendChild(noResultsMessage);
+    noResultsMessage.classList.add("hidden");
+
+// initialize page
 hideStudentsList();
 makePageList();
-showPage(1);
+showPage(1, currentList);
 bindPageHandlerEvents();
+bindSearch();
