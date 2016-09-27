@@ -27,7 +27,7 @@ var addSearch = function () {
     searchArea.appendChild(searchBox);
     searchArea.appendChild(searchButton);
     pageHeader.appendChild(searchArea);
-}
+};
 
 // HIDE ALL STUDENT ITEMS
 var hideStudentsList = function () {
@@ -36,14 +36,11 @@ var hideStudentsList = function () {
         classList.add("hidden"); // and add hidden class to list
         classList.remove("show"); // remove css animation class
     }
-}
+};
 
 // SHOW SELECTED STUDENT ITEMS (DEFINED BY PAGE OF TEN)
 var showPage = function (page, currentList) {
     var rangeMax = page * 10; // calculate upper range of items to show
-    if (currentList.length < rangeMax) { // if the length of the list is less than the upper limit, i.e. there are less than ten to currently show,
-        rangeMax = currentList.length; // set the upper limit to the length of the list
-    }
     var rangeMin = rangeMax - 10; // calculate the lower end of the limit. THIS IS PROBLEMATIC
     rangeIndex.innerText = " Showing students " + rangeMin + " - " + (rangeMax - 1) + " out of " + currentList.length; // add statement to indicate which student items are currently being shown from the matching set
     var pageHeader = document.querySelector(".page-header");
@@ -56,7 +53,7 @@ var showPage = function (page, currentList) {
             classList.toggle("show");
         }
     }
-}
+};
 
 // CREATE UNORDERED LIST FOR PAGINATION LINKS
 var makePageList = function() {
@@ -80,7 +77,7 @@ var makePageList = function() {
     newPagination.classList.add("pagination");
     var page = document.querySelector(".page");
     page.appendChild(newPagination); // add pagination container and list to page
-}
+};
 
 // BIND CLICK EVENTS TO PAGE DISPLAY
 var bindPageHandlerEvents = function () {
@@ -95,7 +92,7 @@ var bindPageHandlerEvents = function () {
             showPage(targetPage, currentList); // SEND PAGE NUMBER TO DISPLAY FUNCTION TO REFRESH STUDENTS ON PAGE
         });
     }
-}
+};
 
 // GET USER SEARCH INPUT AND CREATE MATCHNG LIST
 var search = function () {
@@ -125,7 +122,7 @@ var search = function () {
     } else {
         noResultsMessage.classList.add("hidden");
     }
-}
+};
 
 // bind event to search box
 var bindSearch = function () {
@@ -136,8 +133,8 @@ var bindSearch = function () {
     var searchButton = document.querySelector("#search-button"); 
     searchButton.addEventListener('click', function () { // add event to search button
         search();
-    })
-}
+    });
+};
 
     var content = document.querySelector(".page"); 
     var noResultsMessage = document.createElement("h1"); // create message telling user there are no results
@@ -149,6 +146,6 @@ var bindSearch = function () {
 addSearch();
 hideStudentsList();
 makePageList();
-showPage(1, currentList);
+showPage(1, document.getElementsByTagName("ul")[0].children);
 bindPageHandlerEvents();
 bindSearch();
